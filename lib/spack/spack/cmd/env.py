@@ -85,14 +85,16 @@ def env_activate(args):
     env = args.activate_env
     if not args.shell:
         msg = [
-            "This command works best with Spack's shell support",
+            "`spack env activate` works best with spack's shell support.",
             ""
-        ] + spack.cmd.common.shell_init_instructions + [
-            'Or, if you want to use `spack env activate` without initializing',
-            'shell support, you can run one of these:',
+        ] + spack.cmd.common.shell_init_instructions() + [
+            'Or, if you want to use `spack env activate` without shell',
+            'support, you can run one of these:',
             '',
-            '    eval `spack env activate --sh %s`   # for bash/sh' % env,
-            '    eval `spack env activate --csh %s`  # for csh/tcsh' % env,
+            '    eval `spack env activate --sh   %s`  # bash/zsh/sh' % env,
+            '    eval `spack env activate --csh  %s`  # csh/tcsh' % env,
+            '    eval `spack env activate --fish %s`  # fish' % env,
+            ''
         ]
         tty.msg(*msg)
         return 1
@@ -142,14 +144,16 @@ def env_deactivate_setup_parser(subparser):
 def env_deactivate(args):
     if not args.shell:
         msg = [
-            "This command works best with Spack's shell support",
+            "`spack env deactivate` works best with spack's shell support.",
             ""
-        ] + spack.cmd.common.shell_init_instructions + [
-            'Or, if you want to use `spack env activate` without initializing',
-            'shell support, you can run one of these:',
+        ] + spack.cmd.common.shell_init_instructions() + [
+            'Or, if you want to use `spack env deactivate` without shell',
+            'support, you can run one of these:',
             '',
-            '    eval `spack env deactivate --sh`   # for bash/sh',
-            '    eval `spack env deactivate --csh`  # for csh/tcsh',
+            '    eval `spack env deactivate --sh`   # bash/zsh/sh',
+            '    eval `spack env deactivate --csh`  # csh/tcsh',
+            '    eval `spack env deactivate --fish  # fish',
+            '',
         ]
         tty.msg(*msg)
         return 1

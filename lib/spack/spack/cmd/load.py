@@ -62,16 +62,18 @@ def load(parser, args):
              for spec in spack.cmd.parse_specs(args.specs)]
 
     if not args.shell:
-        specs_string = ' '.join(args.specs)
+        specs_str = ' '.join(args.specs) or "SPECS"
         msg = [
-            "This command works best with Spack's shell support",
+            "`spack load` works best with spack's shell support.",
             ""
-        ] + spack.cmd.common.shell_init_instructions + [
-            'Or, if you want to use `spack load` without initializing',
-            'shell support, you can run one of these:',
+        ] + spack.cmd.common.shell_init_instructions() + [
+            'Or, if you want to use `spack load` without shell',
+            'support, you can run one of these:',
             '',
-            '    eval `spack load --sh %s`   # for bash/sh' % specs_string,
-            '    eval `spack load --csh %s`  # for csh/tcsh' % specs_string,
+            '    eval `spack load --sh   %s`  # bash/zsh/sh' % specs_str,
+            '    eval `spack load --csh  %s`  # csh/tcsh' % specs_str,
+            '    eval `spack load --fish %s`  # fish' % specs_str,
+            '',
         ]
         tty.msg(*msg)
         return 1

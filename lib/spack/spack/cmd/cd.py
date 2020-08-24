@@ -3,8 +3,9 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack.cmd.common import print_module_placeholder_help
+import llnl.util.tty as tty
 
+import spack.cmd.common
 import spack.cmd.location
 
 description = "cd to spack directories in the shell"
@@ -20,4 +21,8 @@ def setup_parser(subparser):
 
 
 def cd(parser, args):
-    print_module_placeholder_help()
+    lines = [
+        "`spack cd` requires spack's shell support.",
+        "",
+    ] + spack.cmd.common.shell_init_instructions()
+    tty.msg(*lines)

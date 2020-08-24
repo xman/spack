@@ -53,15 +53,18 @@ def unload(parser, args):
         specs = spack.store.db.query(hashes=hashes)
 
     if not args.shell:
+        specs_str = ' '.join(args.specs) or "SPECS"
         msg = [
-            "This command works best with Spack's shell support",
+            "`spack unload` works best with spack's shell support.",
             ""
-        ] + spack.cmd.common.shell_init_instructions + [
-            'Or, if you want to use `spack unload` without initializing',
-            'shell support, you can run one of these:',
+        ] + spack.cmd.common.shell_init_instructions() + [
+            'Or, if you want to use `spack unload` without shell',
+            'support, you can run one of these:',
             '',
-            '    eval `spack unload --sh %s`   # for bash/sh' % args.specs,
-            '    eval `spack unload --csh %s`  # for csh/tcsh' % args.specs,
+            '    eval `spack unload --sh   %s`  # bash/zsh/sh' % specs_str,
+            '    eval `spack unload --csh  %s`  # csh/tcsh' % specs_str,
+            '    eval `spack unload --fish %s`  # fish' % specs_str,
+            '',
         ]
         tty.msg(*msg)
         return 1
