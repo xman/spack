@@ -944,6 +944,10 @@ def merge_yaml(dest, source):
         # track keys for marking
         key_marks = {}
 
+        # track this to ensure that source items come *before* dest in
+        # iteration order with OrderdDicts
+        dest_keys = [dk for dk in dest.keys() if dk not in source]
+
         for sk, sv in iteritems(source):
             if _override(sk) or sk not in dest:
                 # if sk ended with ::, or if it's new, completely override
@@ -957,6 +961,12 @@ def merge_yaml(dest, source):
             # Python dicts do not overwrite keys on insert, and we want
             # to copy mark information on source keys to dest.
             key_marks[sk] = sk
+
+        # ensure that dest keys come after source
+        for dk in dest_keys:
+            value = dest[dk]
+            del dest[dk]
+            dest[dk] = value
 
         # ensure that keys are marked in the destination. The
         # key_marks dict ensures we can get the actual source key
