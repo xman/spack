@@ -807,14 +807,14 @@ def relocate_text(
     orig_sbang = '#!/bin/bash {0}/bin/sbang'.format(orig_spack)
     new_sbang = '#!/bin/bash {0}/bin/sbang'.format(new_spack)
 
-    for file in files:
-        _replace_prefix_text(file, orig_install_prefix, new_install_prefix)
+    for filename in files:
+        _replace_prefix_text(filename, orig_install_prefix, new_install_prefix)
         for orig_dep_prefix, new_dep_prefix in new_prefixes.items():
-            _replace_prefix_text(file, orig_dep_prefix, new_dep_prefix)
-        _replace_prefix_text(file, orig_layout_root, new_layout_root)
+            _replace_prefix_text(filename, orig_dep_prefix, new_dep_prefix)
+        _replace_prefix_text(filename, orig_layout_root, new_layout_root)
         # relocate the sbang location only if the spack directory changed
         if orig_spack != new_spack:
-            _replace_prefix_text(file, orig_sbang, new_sbang)
+            _replace_prefix_text(filename, orig_sbang, new_sbang)
 
 
 def relocate_text_bin(
@@ -888,11 +888,11 @@ def is_relocatable(spec):
     return True
 
 
-def file_is_relocatable(file, paths_to_relocate=None):
+def file_is_relocatable(filepath, paths_to_relocate=None):
     """Returns True if the file passed as argument is relocatable.
 
     Args:
-        file: absolute path of the file to be analyzed
+        filepath: absolute path of the file to be analyzed
 
     Returns:
         True or false
@@ -909,28 +909,28 @@ def file_is_relocatable(file, paths_to_relocate=None):
         msg = 'function currently implemented only for linux and macOS'
         raise NotImplementedError(msg)
 
-    if not os.path.exists(file):
-        raise ValueError('{0} does not exist'.format(file))
+    if not os.path.exists(filepath):
+        raise ValueError('{0} does not exist'.format(filepath))
 
-    if not os.path.isabs(file):
-        raise ValueError('{0} is not an absolute path'.format(file))
+    if not os.path.isabs(filepath):
+        raise ValueError('{0} is not an absolute path'.format(filepath))
 
     strings = executable.Executable('strings')
 
     # Remove the RPATHS from the strings in the executable
-    set_of_strings = set(strings(file, output=str).split())
+    set_of_strings = set(strings(filepath, output=str).split())
 
-    m_type, m_subtype = mime_type(file)
+    m_type, m_subtype = mime_type(filepath)
     if m_type == 'application':
         tty.debug('{0},{1}'.format(m_type, m_subtype))
 
     if platform.system().lower() == 'linux':
         if m_subtype == 'x-executable' or m_subtype == 'x-sharedlib':
-            rpaths = ':'.join(_elf_rpaths_for(file))
+            rpaths = ':'.join(_elf_rpaths_for(filepath))
             set_of_strings.discard(rpaths)
     if platform.system().lower() == 'darwin':
         if m_subtype == 'x-mach-binary':
-            rpaths, deps, idpath = macholib_get_paths(file)
+            rpaths, deps, idpath = macholib_get_paths(filepath)
             set_of_strings.discard(set(rpaths))
             set_of_strings.discard(set(deps))
             if idpath is not None:
@@ -941,24 +941,24 @@ def file_is_relocatable(file, paths_to_relocate=None):
             # One binary has the root folder not in the RPATH,
             # meaning that this spec is not relocatable
             msg = 'Found "{0}" in {1} strings'
-            tty.debug(msg.format(path_to_relocate, file))
+            tty.debug(msg.format(path_to_relocate, filepath))
             return False
 
     return True
 
 
-def is_binary(file):
+def is_binary(filepath):
     """Returns true if a file is binary, False otherwise
 
     Args:
-        file: file to be tested
+        filepath: file to be tested
 
     Returns:
         True or False
     """
-    m_type, _ = mime_type(file)
+    m_type, _ = mime_type(filepath)
 
-    msg = '[{0}] -> '.format(file)
+    msg = '[{0}] -> '.format(filepath)
     if m_type == 'application':
         tty.debug(msg + 'BINARY FILE')
         return True
@@ -968,7 +968,7 @@ def is_binary(file):
 
 
 @llnl.util.lang.memoized
-def mime_type(file):
+def mime_type(filepath):
     """Returns the mime type and subtype of a file.
 
     Args:
@@ -978,8 +978,8 @@ def mime_type(file):
         Tuple containing the MIME type and subtype
     """
     file_cmd = executable.Executable('file')
-    output = file_cmd('-b', '-h', '--mime-type', file, output=str, error=str)
-    tty.debug('[MIME_TYPE] {0} -> {1}'.format(file, output.strip()))
+    output = file_cmd('-b', '-h', '--mime-type', filepath, output=str, error=str)
+    tty.debug('[MIME_TYPE] {0} -> {1}'.format(filepath, output.strip()))
     # In corner cases the output does not contain a subtype prefixed with a /
     # In those cases add the / so the tuple can be formed.
     if '/' not in output:
