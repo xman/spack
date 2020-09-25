@@ -978,7 +978,8 @@ def mime_type(filepath):
         Tuple containing the MIME type and subtype
     """
     file_cmd = executable.Executable('file')
-    output = file_cmd('-b', '-h', '--mime-type', filepath, output=str, error=str)
+    output = file_cmd('-b', '-h', '--mime-type', filepath,
+                      output=str, error=str)
     tty.debug('[MIME_TYPE] {0} -> {1}'.format(filepath, output.strip()))
     # In corner cases the output does not contain a subtype prefixed with a /
     # In those cases add the / so the tuple can be formed.
