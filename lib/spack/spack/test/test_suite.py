@@ -8,7 +8,7 @@ import spack.spec
 
 
 def test_test_log_pathname(mock_packages, config):
-    """Ensure alias and test log path are reasonable."""
+    """Ensure test log path is reasonable."""
     spec = spack.spec.Spec('libdwarf').concretized()
 
     test_name = 'test_name'
